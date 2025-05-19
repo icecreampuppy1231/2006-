@@ -1,0 +1,29 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+.env
+
+# IDE/editor files
+.vscode/
+.idea/
+
+# Logs and databases
+*.log
+*.sqlite3
+
+# macOS system files
+.DS_Store
+
+# Byte-compiled / optimized / DLL files
+*.so
+
+
+'''venv/ ignores your virtual environment folder.
+
+.env ignores any file where you might store secrets (like JWT_SECRET_KEY).
+
+__pycache__/ and *.pyc ignore Python bytecode.'''
