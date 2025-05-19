@@ -1,43 +1,6 @@
-README.md
-
-# Flask JWT Authentication Demo
-
-This project implements a simple Flask web application demonstrating a secure login system using JSON Web Tokens (JWT), strong password hashing, and security headers via Flask-Talisman.
-
-## Features
-- User registration with Argon2 password hashing
-- Login endpoint returning a JWT access token
-- Protected route requiring valid JWT
-- Flask-Talisman to enforce security headers (CSP, HSTS, etc.)
-
-## Getting Started
-```bash
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-export FLASK_APP=app.py
-export JWT_SECRET_KEY="your-very-secret-key"
-flask run
-```
-
-Then use `POST /register` and `POST /login` to interact.
-
----
-
-requirements.txt
-
-```
-Flask==2.3.2
-Flask-JWT-Extended==4.4.4
-argon2-cffi==21.3.0
-Flask-Talisman==1.0.0
-```
-
----
-
 app.py
 
-```python
+
 from flask import Flask, request, jsonify
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from argon2 import PasswordHasher
@@ -91,4 +54,4 @@ def protected():
 
 if __name__ == '__main__':
     app.run()
-```
+
