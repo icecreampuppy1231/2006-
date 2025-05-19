@@ -1,0 +1,94 @@
+README.md
+
+# Flask JWT Authentication Demo
+
+This project implements a simple Flask web application demonstrating a secure login system using JSON Web Tokens (JWT), strong password hashing, and security headers via Flask-Talisman.
+
+## Features
+- User registration with Argon2 password hashing
+- Login endpoint returning a JWT access token
+- Protected route requiring valid JWT
+- Flask-Talisman to enforce security headers (CSP, HSTS, etc.)
+
+## Getting Started
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+export FLASK_APP=app.py
+export JWT_SECRET_KEY="your-very-secret-key"
+flask run
+```
+
+Then use `POST /register` and `POST /login` to interact.
+
+---
+
+requirements.txt
+
+```
+Flask==2.3.2
+Flask-JWT-Extended==4.4.4
+argon2-cffi==21.3.0
+Flask-Talisman==1.0.0
+```
+
+---
+
+app.py
+
+```python
+from flask import Flask, request, jsonify
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from argon2 import PasswordHasher
+from flask_talisman import Talisman
+
+app = Flask(__name__)
+# Configure JWT
+app.config["JWT_SECRET_KEY"] = "your-very-secret-key"
+jwt = JWTManager(app)
+
+# Enforce security headers
+Talisman(app)
+
+# In-memory user store
+ph = PasswordHasher()
+users = {}  # format: {username: hashed_password}
+
+@app.route('/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+    if username in users:
+        return jsonify({"msg": "Username already exists"}), 400
+    # Hash password
+    hashed = ph.hash(password)
+    users[username] = hashed
+    return jsonify({"msg": "User registered"}), 201
+
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+    hashed = users.get(username)
+    if not hashed:
+        return jsonify({"msg": "Bad credentials"}), 401
+    try:
+        ph.verify(hashed, password)
+    except:
+        return jsonify({"msg": "Bad credentials"}), 401
+    # Create JWT
+    token = create_access_token(identity=username)
+    return jsonify(access_token=token)
+
+@app.route('/protected', methods=['GET'])
+@jwt_required()
+def protected():
+    current_user = get_jwt_identity()
+    return jsonify(logged_in_as=current_user), 200
+
+if __name__ == '__main__':
+    app.run()
+```
